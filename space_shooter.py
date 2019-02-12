@@ -17,6 +17,7 @@ orange = (255, 127, 80) #lasers
 
 all_sprites = pygame.sprite.Group() # Create a sprite group
 asteroids = pygame.sprite.Group()
+lasers = pygame.sprite.Group()
 
 
 class SpaceShip(pygame.sprite.Sprite):
@@ -26,7 +27,7 @@ class SpaceShip(pygame.sprite.Sprite):
 
     def __init__(self):
         pygame.sprite.Sprite.__init__(self)
-        self.image = pygame.image.load('SpaceShipSmall.png').covert()
+        self.image = pygame.image.load('SpaceShipSmall.png').convert()
 
         '''making our asteroids and its behavior'''
 
@@ -43,15 +44,21 @@ class SpaceShip(pygame.sprite.Sprite):
             self.speed_x = -10
         if keypress[pygame.K_RIGHT]:
             self.speed_x = 10
-        self.rect.x = self.speed_x
+        self.rect.x += self.speed_x
 
         '''Prevents ship from going off screen
         and quiting the game'''
         if self.rect.right > w_width: #right side of the screen
             self.rect.right = w_width
 
-        if self.rect.left < 0: #left side of the screen
+        if self.rect.left < 0: #eft side of the screen
             self.rect.left = 0
+
+
+    def fire_laser(self):
+        laser = Lasers(self.rect.x + 35, self.rect.y) # create a laser object at the ships location.
+        all_sprites.add(laser) # add to all_sprites group
+        lasers.add(laser) # add to laser sprites group
 
 
 class Asteroids(pygame.sprite.Sprite):
@@ -81,7 +88,29 @@ class Asteroids(pygame.sprite.Sprite):
 
 
 
+class Lasers(pygame.sprite.Sprite):
+
+    '''Shooting the enemy asteroids'''
+
+    def __init__(self, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = pygame.Surface((5, 15))
+        self.image.fill(orange)
+        self.rect = self.image.get_rect()
+        self.rect.bottom = y
+        self.rect.x = x
+        self.speed_y = -20 #negative because lasers need to fire upwards
+
+
+    def update(self):
+        self.rect.y += self.speed_y
+        if self.rect.bottom < 0: # will make it so if laser goes off screen it will be deleted.
+            self.kill()
+
+
+
 '''Creating the gameplay loop'''
+''' THIS IS THE CORE OF OUR FUNCTIONALITY'''
 
 def gameplay():
 
@@ -107,13 +136,13 @@ def gameplay():
 
     ''' make asteroids/sprites'''
 
-    for i in range(15):
+    for i in range(20):
         a = Asteroids()
         all_sprites.add(a)
         asteroids.add(a)
 
 
-
+    '''Finishing up and staring the game'''
     exitGame = False
 
     while exitGame == False:
@@ -121,7 +150,34 @@ def gameplay():
             if event.type == pygame.QUIT:
                 exitGame = True
 
-        print(event) #monitor the console
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_SPACE:
+                    player.fire_laser()
+
+
+            print(event) #monitor events in the console
+        all_sprites.update()
+
+
+        collide = pygame.sprite.spritecollide(player, asteroids, False)
+
+
+        destroy_asteroid = pygame.sprite.groupcollide(asteroids, lasers, True, True )
+
+
+        for col in range(len(destroy_asteroid)): #regenerates more asteroids
+            a2 = Asteroids()
+            all_sprites.add(a2)
+            asteroids.add(a2)
+
+
+        if len(collide) > 0: # Checking if list has any values and exiting game if true.
+            exitGame = True
+
+
+        gameDisplay.fill(black)
+        all_sprites.draw(gameDisplay)
+        pygame.display.flip()
 
         clock.tick(60) #frames per second
 

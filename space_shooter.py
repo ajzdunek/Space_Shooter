@@ -139,7 +139,7 @@ def gameplay():
 
     ''' make asteroids/sprites'''
 
-    for i in range(20):
+    for i in range(15):
         a = Asteroids()
         all_sprites.add(a)
         asteroids.add(a)

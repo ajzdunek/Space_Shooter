@@ -1,0 +1,1626 @@
+% !PS-Adobe-3.0
+%%BoundingBox: 24 24 571 818
+%%Title: Enscript Output
+%%For: Andrew J. Zdunek
+%%Creator: GNU Enscript 1.6.6
+%%CreationDate: Tue Feb 12 14:40:12 2019
+%%Orientation: Landscape
+%%Pages: (atend)
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6 6
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6 6
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 10 10 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [595 842] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-enscript 1.6 6
+%%IncludeResource: font Times-Bold
+%%IncludeResource: font Times-Roman
+
+% Fonts.
+/Times-Bold /HeaderFont-Bold MF
+/HeaderDateF /HeaderFont-Bold findfont 12 scalefont def
+
+/Times-Roman /HeaderFont-Times MF
+/HeaderHDRF /HeaderFont-Times findfont 14 scalefont def
+
+/HeaderPageNumF /Helvetica-Bold findfont 28.8 scalefont def
+
+/do_header {	% print enscript header
+  gsave
+    d_header_x d_header_y translate
+
+    % light bar
+    0 0 d_header_w d_header_h 2 div Box
+    .95 setgray fill
+
+    % dark gray boxes
+    /dbw d_header_h 2 mul def	% dark box width
+    /dbc .7 def			% dark box color
+
+    % left dark box.
+    0 0 dbw d_header_h Box
+    dbc setgray fill
+
+    0 setgray 
+    HeaderDateF setfont
+    moddatestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 2 div 2 add moveto show
+    modtimestr dup stringwidth pop dbw exch sub 2 div 
+    d_header_h 5 div moveto show
+
+    % right dark box
+    d_header_w dbw sub 0 dbw d_header_h Box
+    dbc setgray fill
+
+    HeaderPageNumF setfont
+    1 setgray
+    pagenumstr dup
+    stringwidth pop dbw exch sub 2 div d_header_w dbw sub add
+    d_header_h .2 mul moveto show
+
+    % filename
+    0 setgray 
+    HeaderHDRF setfont
+    d_header_w fname stringwidth pop sub 2 div d_header_h 8 div moveto
+    fname show
+
+    % user supplied header string.
+    user_header_p {
+      /h d_header_h 8 div 5 mul def
+
+      % Implement strict enscript compatibility.
+      user_header_center_str () eq user_header_right_str () eq and {
+        d_header_w user_header_left_str stringwidth pop sub 2 div 
+        h moveto user_header_left_str show
+      } {
+        dbw 5 add h moveto user_header_left_str show
+
+        d_header_w user_header_center_str stringwidth pop sub 2 div 
+        h moveto user_header_center_str show
+
+	d_header_w dbw sub 5 sub user_header_right_str stringwidth pop
+	sub h moveto user_header_right_str show
+      } ifelse
+    } if
+
+  grestore
+} def
+%%EndResource
+/d_page_w 794 def
+/d_page_h 547 def
+/d_header_x 0 def
+/d_header_y 511 def
+/d_header_w 794 def
+/d_header_h 36 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 794 def
+/d_footer_h 0 def
+/d_output_w 794 def
+/d_output_h 511 def
+/cols 1 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 1 def
+/fname (space_shooter.py) def
+/fdir (.) def
+/ftail (space_shooter.py) def
+% User defined strings:
+/pagenumstr (1) def
+/moddatestr (02/12/19) def
+/modtimestr (14:22:37) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+30 498 M (1:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 498 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+84 498 M
+( pygame) s
+30 487 M (2:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 487 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+84 487 M
+( sys) s
+30 476 M (3:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 476 M
+(import) s
+/F-gs-font 10 10 SF
+0 setgray
+84 476 M
+( random) s
+30 465 M (4:) s
+30 454 M (5:) s
+30 443 M (6:) s
+48 443 M
+(pygame.init\(\)) s
+30 432 M (7:) s
+48 432 M
+( ) s
+30 421 M (8:) s
+48 421 M
+(pygame.font.init\(\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+162 421 M
+(#our font) s
+/F-gs-font 10 10 SF
+30 410 M (9:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+24 399 M (10:) s
+24 388 M (11:) s
+48 388 M
+(w_width = 800 ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+132 388 M
+(# Set window width) s
+/F-gs-font 10 10 SF
+24 377 M (12:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 377 M
+(w_height = 600 ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+138 377 M
+(# Set window height) s
+/F-gs-font 10 10 SF
+24 366 M (13:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+24 355 M (14:) s
+24 344 M (15:) s
+48 344 M
+(black = \(0, 0, 0\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+156 344 M
+(#background) s
+/F-gs-font 10 10 SF
+24 333 M (16:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 333 M
+(white = \(255, 255, 255\)) s
+24 322 M (17:) s
+48 322 M
+(gray = \(105, 105, 105\)) s
+24 311 M (18:) s
+48 311 M
+(orange = \(255, 127, 80\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+192 311 M
+(#lasers) s
+/F-gs-font 10 10 SF
+24 300 M (19:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+24 289 M (20:) s
+48 289 M
+(all_sprites = pygame.sprite.Group\(\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+264 289 M
+(# Create a sprite group) s
+/F-gs-font 10 10 SF
+24 278 M (21:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 278 M
+(asteroids = pygame.sprite.Group\(\)) s
+24 267 M (22:) s
+48 267 M
+(lasers = pygame.sprite.Group\(\)) s
+24 256 M (23:) s
+24 245 M (24:) s
+24 234 M (25:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 234 M
+(class) s
+/F-gs-font 10 10 SF
+0 setgray
+78 234 M
+( SpaceShip\(pygame.sprite.Sprite\):) s
+24 223 M (26:) s
+24 212 M (27:) s
+24 201 M (28:) s
+48 201 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 201 M
+('''Load spaceship image''') s
+/F-gs-font 10 10 SF
+0 setgray
+24 190 M (29:) s
+24 179 M (30:) s
+48 179 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 179 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+90 179 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 179 M
+(__init__) s
+/F-gs-font 10 10 SF
+0 setgray
+144 179 M
+(\(self\):) s
+24 168 M (31:) s
+48 168 M
+(        pygame.sprite.Sprite.__init__\(self\)) s
+24 157 M (32:) s
+48 157 M
+(        self.image = pygame.image.load\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+282 157 M
+('SpaceShipSmall.png') s
+/F-gs-font 10 10 SF
+0 setgray
+402 157 M
+(\).convert\(\)) s
+24 146 M (33:) s
+24 135 M (34:) s
+48 135 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+96 135 M
+('''making our asteroids and its behavior''') s
+/F-gs-font 10 10 SF
+0 setgray
+24 124 M (35:) s
+24 113 M (36:) s
+48 113 M
+(        self.rect = self.image.get_rect\(\)) s
+24 102 M (37:) s
+48 102 M
+(        self.rect.x = w_width * 0.25) s
+24 91 M (38:) s
+48 91 M
+(        self.rect.y = w_height * 0.9) s
+24 80 M (39:) s
+48 80 M
+(        self.speed_x = 0) s
+24 69 M (40:) s
+24 58 M (41:) s
+48 58 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+96 58 M
+('''Controlling our game''') s
+/F-gs-font 10 10 SF
+0 setgray
+24 47 M (42:) s
+48 47 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 47 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+90 47 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 47 M
+(update) s
+/F-gs-font 10 10 SF
+0 setgray
+132 47 M
+(\(self\):) s
+24 36 M (43:) s
+48 36 M
+(        self.speed_x = 0) s
+24 25 M (44:) s
+48 25 M
+(        keypress = pygame.key.get_pressed\(\)) s
+24 14 M (45:) s
+48 14 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 14 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+108 14 M
+( keypress[pygame.K_LEFT]:) s
+24 3 M (46:) s
+48 3 M
+(            self.speed_x = -10) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 2 def
+/fname (space_shooter.py) def
+/fdir (.) def
+/ftail (space_shooter.py) def
+% User defined strings:
+/pagenumstr (2) def
+/moddatestr (02/12/19) def
+/modtimestr (14:22:37) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+24 498 M (47:) s
+48 498 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 498 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+108 498 M
+( keypress[pygame.K_RIGHT]:) s
+24 487 M (48:) s
+48 487 M
+(            self.speed_x = 10) s
+24 476 M (49:) s
+48 476 M
+(        self.rect.x += self.speed_x) s
+24 465 M (50:) s
+24 454 M (51:) s
+48 454 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+96 454 M
+('''Prevents ship from going off screen) s
+/F-gs-font 10 10 SF
+24 443 M (52:) s
+/Courier-Bold 10 10 SUF
+48 443 M
+(        and quiting the game''') s
+/F-gs-font 10 10 SF
+0 setgray
+24 432 M (53:) s
+48 432 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 432 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+108 432 M
+( self.rect.right > w_width: ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+276 432 M
+(#right side of the screen) s
+/F-gs-font 10 10 SF
+24 421 M (54:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 421 M
+(            self.rect.right = w_width) s
+24 410 M (55:) s
+24 399 M (56:) s
+48 399 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 399 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+108 399 M
+( self.rect.left < 0: ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+234 399 M
+(#eft side of the screen) s
+/F-gs-font 10 10 SF
+24 388 M (57:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 388 M
+(            self.rect.left = 0) s
+24 377 M (58:) s
+24 366 M (59:) s
+24 355 M (60:) s
+48 355 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 355 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+90 355 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 355 M
+(fire_laser) s
+/F-gs-font 10 10 SF
+0 setgray
+156 355 M
+(\(self\):) s
+24 344 M (61:) s
+48 344 M
+(        laser = Lasers\(self.rect.x + 35, self.rect.y\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+372 344 M
+(# create a laser object at the ships location.) s
+/F-gs-font 10 10 SF
+24 333 M (62:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 333 M
+(        all_sprites.add\(laser\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+234 333 M
+(# add to all_sprites group) s
+/F-gs-font 10 10 SF
+24 322 M (63:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 322 M
+(        lasers.add\(laser\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+204 322 M
+(# add to laser sprites group) s
+/F-gs-font 10 10 SF
+24 311 M (64:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+24 300 M (65:) s
+24 289 M (66:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 289 M
+(class) s
+/F-gs-font 10 10 SF
+0 setgray
+78 289 M
+( Asteroids\(pygame.sprite.Sprite\):) s
+24 278 M (67:) s
+24 267 M (68:) s
+24 256 M (69:) s
+48 256 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 256 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+90 256 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 256 M
+(__init__) s
+/F-gs-font 10 10 SF
+0 setgray
+144 256 M
+(\(self\):) s
+24 245 M (70:) s
+48 245 M
+(        pygame.sprite.Sprite.__init__\(self\)) s
+24 234 M (71:) s
+48 234 M
+(        r = random.randint\(20, 60\)) s
+24 223 M (72:) s
+48 223 M
+(        self.image = pygame.Surface\(\(r, r\)\)) s
+24 212 M (73:) s
+48 212 M
+(        self.image.fill\(gray\)) s
+24 201 M (74:) s
+48 201 M
+(        self.rect = self.image.get_rect\(\)) s
+24 190 M (75:) s
+48 190 M
+(        self.rect.x = random.randrange\(0, w_width\)) s
+24 179 M (76:) s
+48 179 M
+(        self.rect.y = -600) s
+24 168 M (77:) s
+48 168 M
+(        self.speed_y = random.randrange\(5, 8\)) s
+24 157 M (78:) s
+24 146 M (79:) s
+24 135 M (80:) s
+48 135 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 135 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+90 135 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 135 M
+(update) s
+/F-gs-font 10 10 SF
+0 setgray
+132 135 M
+(\(self\):) s
+24 124 M (81:) s
+24 113 M (82:) s
+48 113 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+96 113 M
+('''update the position of the asteroid) s
+/F-gs-font 10 10 SF
+24 102 M (83:) s
+/Courier-Bold 10 10 SUF
+48 102 M
+(        based on the random speed''') s
+/F-gs-font 10 10 SF
+0 setgray
+24 91 M (84:) s
+24 80 M (85:) s
+48 80 M
+(        self.rect.y += self.speed_y) s
+24 69 M (86:) s
+48 69 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 69 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+108 69 M
+( self.rect.y > w_height:) s
+24 58 M (87:) s
+48 58 M
+(            self.rect.x = random.randrange\(0, w_width\)) s
+24 47 M (88:) s
+48 47 M
+(            self.rect.y = -600) s
+24 36 M (89:) s
+48 36 M
+(            self.speed_y = random.randrange\(5, 8\)) s
+24 25 M (90:) s
+24 14 M (91:) s
+24 3 M (92:) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 3 def
+/fname (space_shooter.py) def
+/fdir (.) def
+/ftail (space_shooter.py) def
+% User defined strings:
+/pagenumstr (3) def
+/moddatestr (02/12/19) def
+/modtimestr (14:22:37) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+24 498 M (93:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 498 M
+(class) s
+/F-gs-font 10 10 SF
+0 setgray
+78 498 M
+( Lasers\(pygame.sprite.Sprite\):) s
+24 487 M (94:) s
+24 476 M (95:) s
+48 476 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 476 M
+('''Shooting the enemy asteroids''') s
+/F-gs-font 10 10 SF
+0 setgray
+24 465 M (96:) s
+24 454 M (97:) s
+48 454 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 454 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+90 454 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 454 M
+(__init__) s
+/F-gs-font 10 10 SF
+0 setgray
+144 454 M
+(\(self, x, y\):) s
+24 443 M (98:) s
+48 443 M
+(        pygame.sprite.Sprite.__init__\(self\)) s
+24 432 M (99:) s
+48 432 M
+(        self.image = pygame.Surface\(\(5, 15\)\)) s
+18 421 M (100:) s
+48 421 M
+(        self.image.fill\(orange\)) s
+18 410 M (101:) s
+48 410 M
+(        self.rect = self.image.get_rect\(\)) s
+18 399 M (102:) s
+48 399 M
+(        self.rect.bottom = y) s
+18 388 M (103:) s
+48 388 M
+(        self.rect.x = x) s
+18 377 M (104:) s
+48 377 M
+(        self.speed_y = -20 ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+210 377 M
+(#negative because lasers need to fire upwards) s
+/F-gs-font 10 10 SF
+18 366 M (105:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+18 355 M (106:) s
+18 344 M (107:) s
+48 344 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 344 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+90 344 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+96 344 M
+(update) s
+/F-gs-font 10 10 SF
+0 setgray
+132 344 M
+(\(self\):) s
+18 333 M (108:) s
+48 333 M
+(        self.rect.y += self.speed_y) s
+18 322 M (109:) s
+48 322 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 322 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+108 322 M
+( self.rect.bottom < 0: ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+246 322 M
+(# will make it so if laser goes off screen it will be deleted.) s
+/F-gs-font 10 10 SF
+18 311 M (110:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 311 M
+(            self.kill\(\)) s
+18 300 M (111:) s
+18 289 M (112:) s
+18 278 M (113:) s
+18 267 M (114:) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+48 267 M
+('''Creating the gameplay loop''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 256 M (115:) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+48 256 M
+(''' THIS IS THE CORE OF OUR FUNCTIONALITY''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 245 M (116:) s
+18 234 M (117:) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+48 234 M
+(def) s
+/F-gs-font 10 10 SF
+0 setgray
+66 234 M
+( ) s
+/Courier-Bold 10 10 SUF
+0 0 1 setrgbcolor
+72 234 M
+(gameplay) s
+/F-gs-font 10 10 SF
+0 setgray
+120 234 M
+(\(\):) s
+18 223 M (118:) s
+18 212 M (119:) s
+48 212 M
+(    spaceshipwidth = 75) s
+18 201 M (120:) s
+18 190 M (121:) s
+48 190 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 190 M
+('''Set the game display ) s
+/F-gs-font 10 10 SF
+18 179 M (122:) s
+/Courier-Bold 10 10 SUF
+48 179 M
+(    width and height''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 168 M (123:) s
+48 168 M
+(    gameDisplay = pygame.display.set_mode\(\(w_width, w_height\)\)) s
+18 157 M (124:) s
+18 146 M (125:) s
+48 146 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 146 M
+('''Set the title) s
+/F-gs-font 10 10 SF
+18 135 M (126:) s
+/Courier-Bold 10 10 SUF
+48 135 M
+(     of the game''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 124 M (127:) s
+48 124 M
+(    pygame.display.set_caption\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+234 124 M
+('Space Wars') s
+/F-gs-font 10 10 SF
+0 setgray
+306 124 M
+(\)) s
+18 113 M (128:) s
+18 102 M (129:) s
+48 102 M
+(    clock = pygame.time.Clock\(\)) s
+18 91 M (130:) s
+18 80 M (131:) s
+48 80 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 80 M
+('''font and font set for score''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 69 M (132:) s
+48 69 M
+(    sfont = pygame.font.SysFont\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+240 69 M
+('Arial') s
+/F-gs-font 10 10 SF
+0 setgray
+282 69 M
+(, 20\)) s
+18 58 M (133:) s
+48 58 M
+(    score = 0) s
+18 47 M (134:) s
+18 36 M (135:) s
+48 36 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 36 M
+('''creating the player object''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 25 M (136:) s
+48 25 M
+(    player = SpaceShip\(\)) s
+18 14 M (137:) s
+48 14 M
+(    all_sprites.add\(player\)) s
+18 3 M (138:) s
+_R
+S
+%%Page: (4) 4
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 4 def
+/fname (space_shooter.py) def
+/fdir (.) def
+/ftail (space_shooter.py) def
+% User defined strings:
+/pagenumstr (4) def
+/moddatestr (02/12/19) def
+/modtimestr (14:22:37) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+18 498 M (139:) s
+18 487 M (140:) s
+48 487 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 487 M
+(''' make asteroids/sprites''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 476 M (141:) s
+18 465 M (142:) s
+48 465 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 465 M
+(for) s
+/F-gs-font 10 10 SF
+0 setgray
+90 465 M
+( i ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+108 465 M
+(in) s
+/F-gs-font 10 10 SF
+0 setgray
+120 465 M
+( range\(15\):) s
+18 454 M (143:) s
+48 454 M
+(        a = Asteroids\(\)) s
+18 443 M (144:) s
+48 443 M
+(        all_sprites.add\(a\)) s
+18 432 M (145:) s
+48 432 M
+(        asteroids.add\(a\)) s
+18 421 M (146:) s
+18 410 M (147:) s
+18 399 M (148:) s
+48 399 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+72 399 M
+('''Finishing up and staring the game''') s
+/F-gs-font 10 10 SF
+0 setgray
+18 388 M (149:) s
+48 388 M
+(    exitGame = False) s
+18 377 M (150:) s
+18 366 M (151:) s
+48 366 M
+(    ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+72 366 M
+(while) s
+/F-gs-font 10 10 SF
+0 setgray
+102 366 M
+( exitGame == False:) s
+18 355 M (152:) s
+48 355 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 355 M
+(for) s
+/F-gs-font 10 10 SF
+0 setgray
+114 355 M
+( event ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+156 355 M
+(in) s
+/F-gs-font 10 10 SF
+0 setgray
+168 355 M
+( pygame.event.get\(\):) s
+18 344 M (153:) s
+48 344 M
+(            ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+120 344 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+132 344 M
+( event.type == pygame.QUIT:) s
+18 333 M (154:) s
+48 333 M
+(                exitGame = True) s
+18 322 M (155:) s
+18 311 M (156:) s
+48 311 M
+(            ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+120 311 M
+(elif) s
+/F-gs-font 10 10 SF
+0 setgray
+144 311 M
+( event.type == pygame.KEYDOWN:) s
+18 300 M (157:) s
+48 300 M
+(                ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 300 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+156 300 M
+( event.key == pygame.K_SPACE:) s
+18 289 M (158:) s
+48 289 M
+(                    player.fire_laser\(\)) s
+18 278 M (159:) s
+18 267 M (160:) s
+18 256 M (161:) s
+48 256 M
+(            ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+120 256 M
+(print) s
+/F-gs-font 10 10 SF
+0 setgray
+150 256 M
+(\(event\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+198 256 M
+(#monitor events in the console) s
+/F-gs-font 10 10 SF
+18 245 M (162:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 245 M
+(        all_sprites.update\(\)) s
+18 234 M (163:) s
+18 223 M (164:) s
+18 212 M (165:) s
+48 212 M
+(        collide = pygame.sprite.spritecollide\(player, asteroids, False\)) s
+18 201 M (166:) s
+18 190 M (167:) s
+18 179 M (168:) s
+48 179 M
+(        destroy_asteroid = pygame.sprite.groupcollide\(asteroids, lasers, True, True \)) s
+18 168 M (169:) s
+18 157 M (170:) s
+18 146 M (171:) s
+48 146 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 146 M
+(for) s
+/F-gs-font 10 10 SF
+0 setgray
+114 146 M
+( col ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+144 146 M
+(in) s
+/F-gs-font 10 10 SF
+0 setgray
+156 146 M
+( range\(len\(destroy_asteroid\)\): ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+342 146 M
+(#regenerates more asteroids) s
+/F-gs-font 10 10 SF
+18 135 M (172:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 135 M
+(            score += 1) s
+18 124 M (173:) s
+48 124 M
+(            a2 = Asteroids\(\)) s
+18 113 M (174:) s
+48 113 M
+(            all_sprites.add\(a2\)) s
+18 102 M (175:) s
+48 102 M
+(            asteroids.add\(a2\)) s
+18 91 M (176:) s
+18 80 M (177:) s
+18 69 M (178:) s
+48 69 M
+(        ) s
+/Courier-Bold 10 10 SUF
+0.627451 0.12549 0.941176 setrgbcolor
+96 69 M
+(if) s
+/F-gs-font 10 10 SF
+0 setgray
+108 69 M
+( len\(collide\) > 0: ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+222 69 M
+(# Checking if list has any values and exiting game if true.) s
+/F-gs-font 10 10 SF
+18 58 M (179:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 58 M
+(            exitGame = True) s
+18 47 M (180:) s
+18 36 M (181:) s
+18 25 M (182:) s
+48 25 M
+(        gameDisplay.fill\(black\)) s
+18 14 M (183:) s
+48 14 M
+(        all_sprites.draw\(gameDisplay\)) s
+18 3 M (184:) s
+48 3 M
+(        player_score = sfont.render\() s
+/Courier-Bold 10 10 SUF
+0.737255 0.560784 0.560784 setrgbcolor
+264 3 M
+('Score: ') s
+/F-gs-font 10 10 SF
+0 setgray
+318 3 M
+( + str\(score\), False, \(0, 255, 127\)\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+540 3 M
+(#render the score with text color, False ) s
+_R
+S
+%%Page: (5) 5
+%%BeginPageSetup
+_S
+90 rotate
+24 -571 translate
+/pagenum 5 def
+/fname (space_shooter.py) def
+/fdir (.) def
+/ftail (space_shooter.py) def
+/Courier-Oblique 10 10 SUF
+% User defined strings:
+/pagenumstr (5) def
+/moddatestr (02/12/19) def
+/modtimestr (14:22:37) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+0.698039 0.133333 0.133333 setrgbcolor
+/F-gs-font 10 10 SF
+18 498 M (185:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 498 M
+(        gameDisplay.blit\(player_score, \(1, 20\)\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+336 498 M
+(#blit the score onto the screen upper right hand corner) s
+/F-gs-font 10 10 SF
+18 487 M (186:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+48 487 M
+(        pygame.display.flip\(\)) s
+18 476 M (187:) s
+18 465 M (188:) s
+48 465 M
+(        clock.tick\(60\) ) s
+/Courier-Oblique 10 10 SUF
+0.698039 0.133333 0.133333 setrgbcolor
+186 465 M
+(#frames per second) s
+/F-gs-font 10 10 SF
+18 454 M (189:) s
+/Courier-Oblique 10 10 SUF
+/F-gs-font 10 10 SF
+0 setgray
+18 443 M (190:) s
+18 432 M (191:) s
+48 432 M
+(gameplay\(\)) s
+18 421 M (192:) s
+48 421 M
+(pygame.quit\(\)) s
+18 410 M (193:) s
+48 410 M
+(sys.exit\(\)) s
+_R
+S
+%%Trailer
+%%Pages: 5
+%%DocumentNeededResources: font Times-Roman Courier-Oblique Courier-Bold 
+%%+ font Courier Times-Bold 
+%%EOF

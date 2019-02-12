@@ -5,6 +5,8 @@ import random
 
 pygame.init()
 
+pygame.font.init() #our font
+
 
 w_width = 800 # Set window width
 w_height = 600 # Set window height
@@ -126,8 +128,9 @@ def gameplay():
 
     clock = pygame.time.Clock()
 
-    '''font set for score'''
+    '''font and font set for score'''
     sfont = pygame.font.SysFont('Arial', 20)
+    score = 0
 
     '''creating the player object'''
     player = SpaceShip()
@@ -166,6 +169,7 @@ def gameplay():
 
 
         for col in range(len(destroy_asteroid)): #regenerates more asteroids
+            score += 1
             a2 = Asteroids()
             all_sprites.add(a2)
             asteroids.add(a2)
@@ -177,6 +181,8 @@ def gameplay():
 
         gameDisplay.fill(black)
         all_sprites.draw(gameDisplay)
+        player_score = sfont.render('Score: ' + str(score), False, (0, 255, 127)) #render the score with text color, False is for alias.
+        gameDisplay.blit(player_score, (1, 20)) #blit the score onto the screen upper right hand corner
         pygame.display.flip()
 
         clock.tick(60) #frames per second

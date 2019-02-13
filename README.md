@@ -17,4 +17,4 @@ Making a Space Shooter with Python and PyGame.
 
 ## Acknowledgments
 
-I took the [Python for Everyone](https://www.udemy.com/pythonforeveryone/) course by Dylan Curry because I wanted to learn about game development using PyCharm.
+I took the [Python for Everyone](https://www.udemy.com/pythonforeveryone/) course by Dylan Curry because I wanted to learn about game development using PyGame.

@@ -14,3 +14,7 @@ Making a Space Shooter with Python and PyGame.
 ## Author
 
 **Andrew Zdunek** (https://github.com/ajzdunek)
+
+## Acknowledgment
+
+I took the [Python for Everyone](https://www.udemy.com/pythonforeveryone/) course by Dylan Curry because I wanted to learn about game development using PyCharm.
